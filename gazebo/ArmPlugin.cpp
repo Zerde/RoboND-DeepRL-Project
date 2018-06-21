@@ -119,7 +119,7 @@ ArmPlugin::ArmPlugin() : ModelPlugin(), cameraNode(new gazebo::transport::Node()
 	avgGoalDelta     = 0.0f;
 	successfulGrabs = 0;
 	totalRuns       = 0;
-        hitGroundCount = 0; // added
+        //hitGroundCount = 0; // added
 }
 
 
@@ -272,17 +272,22 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 		
 		
 		
-		if (strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM  ) == 0)
+		if ((strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM  ) == 0) &&
+                    (strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) == 0))
 		{
-                        float diffr = ((maxEpisodeLength -episodeFrames)/maxEpisodeLength) * 1000;
-                        //printf("diffr = %f episodeFrames= %i maxEpisodeLength = %i\n", diffr,episodeFrames,maxEpisodeLength);
-			rewardHistory = REWARD_WIN;// + float(maxEpisodeLength -episodeFrames)/float(maxEpisodeLength);
+			rewardHistory = REWARD_WIN;
 
 			newReward  = true;
 			endEpisode = true;
 
 			return;
-		}
+		}else //collision with other part
+                 {
+                   rewardHistory = REWARD_LOSS / 10;
+
+		   newReward  = true;
+		   endEpisode = false;
+                }
 		
 
 		
@@ -593,7 +598,7 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
 		bool checkGroundContact = (gripBBox.min.z <= groundContact) || (gripBBox.max.z <= groundContact);
 		if(checkGroundContact)
 		{
-                        hitGroundCount += 1;
+                        
 
 			if(DEBUG){printf("GROUND CONTACT, EOE\n");}
 
