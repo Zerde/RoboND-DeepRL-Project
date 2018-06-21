@@ -89,6 +89,7 @@ private:
 	int      runHistoryIdx;
 	int	    runHistoryMax;
 	bool     runHistory[20];
+	int     hitGroundCount;
 
 	physics::ModelPtr model;
 	event::ConnectionPtr updateConnection;
